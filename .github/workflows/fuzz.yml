@@ -1,0 +1,22 @@
+name: Fuzz
+
+on:
+  schedule:
+    - cron: '0 0 * * 0'  # Weekly on Sunday
+  workflow_dispatch:
+
+jobs:
+  fuzz:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@nightly
+      
+      - name: Install cargo-fuzz
+        run: cargo install cargo-fuzz
+      
+      - name: Run fuzz tests (5 min)
+        run: cargo fuzz run partition_parser -- -max_total_time=300
+        continue-on-error: true  # Don't fail CI if fuzz targets don't exist yet
